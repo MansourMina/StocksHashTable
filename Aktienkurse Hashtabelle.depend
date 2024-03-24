@@ -1,21 +1,39 @@
 # depslib dependency file v1.0
-1711224579 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\stock.cpp
+1711322865 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\stock.cpp
+	"Stock.h"
+	<string>
+	<iostream>
+
+1711315269 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\stock.h
+	<string>
+
+1711322431 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\manager.cpp
+	"Manager.h"
+	<iostream>
+	<cmath>
+
+1711322392 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\manager.h
+	<string>
+	"Stock.h"
+	"HashTable.h"
+
+1711322534 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\main.cpp
+	<iostream>
+	<string>
+	"Manager.h"
+
+1711318921 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\hash.cpp
+	"Hash.h"
+
+1711318886 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\hash.h
 	"Stock.h"
 	<string>
 
-1711238713 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\stock.h
-	<string>
-
-1711238811 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\manager.cpp
-	"Manager.h"
-	<iostream>
-
-1711238389 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\manager.h
-	<string>
+1711322049 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\hashtable.h
 	"Stock.h"
-
-1711238713 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\main.cpp
-	<iostream>
 	<string>
-	"Manager.h"
+
+1711322764 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\hashtable.cpp
+	"HashTable.h"
+	<iostream>
 

@@ -47,6 +47,30 @@ void add_stock_input(std::string &name, std::string &wkn)
     std::cin >> wkn;
 }
 
+void search_stock_input(int &searchType, std::string &searchName)
+{
+
+    std::cout << "Search by Name[1] Initials[2]: ";
+    std::cin >> searchType;
+    while(1)
+    {
+        switch(searchType)
+        {
+        case SEARCH_TYPE::BY_NAME:
+            std::cout << "Name: ";
+            break;
+        case SEARCH_TYPE::BY_INITIALS:
+            std::cout << "Initials: ";
+            break;
+        default:
+            continue;
+        }
+        break;
+    }
+
+    std::cin >> searchName;
+}
+
 void action(Manager* manager, int input)
 {
     switch(input)
@@ -70,11 +94,13 @@ void action(Manager* manager, int input)
     }
     case SEARCH:
     {
-        std::string name;
-        std::cout << "Name: ";
-        std::cin >> name;
-        Stock* stock = manager->find_stock(name);
-        std::cout << (stock != nullptr ? stock->get_initials():"Not Found!!") << std::endl;
+        std::string searchName;
+        int searchType;
+        search_stock_input(searchType, searchName);
+        Stock* foundStock = manager->search_stock(searchType, searchName);
+        std::cout << "Name: " << foundStock->get_name() << std::endl;
+        std::cout << "Initials: " << foundStock->get_initials() << std::endl;
+        std::cout << "WKN: " << foundStock->get_wkn() << std::endl;
         break;
     }
     case PLOT:

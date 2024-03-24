@@ -9,7 +9,6 @@ public:
     std::string get_name();
     std::string get_wkn();
     std::string get_initials();
-    Stock* next = nullptr;
 private:
     std::string name;
     std::string wkn;
