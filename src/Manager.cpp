@@ -7,45 +7,53 @@ Manager::Manager()
 {
     stocksCount= 0;
     hashtable = new HashTable(STOCKS_SIZE);
+    name_initials = new std::unordered_map<std::string, std::string>;
+    initials = new std::unordered_set<std::string>;
 }
 
 Manager::~Manager()
 {
     for(int i = 0; i < stocksCount; i++)
         delete stocks[i];
+    delete name_initials;
 }
 
-void Manager::add_stock(std::string name, std::string wkn)
+void Manager::add_stock(std::string name,std::string initials, std::string wkn)
 {
-    name = stock_toupper(name);
-    std::string initials = get_initials(name);
+    if(stocksCount + 1 >= STOCKS_SIZE){
+        std::cerr << "Failed: Maximum stock capacity reached!" << std::endl;
+        return;
+    }
+    name = stock_toupper(name), initials = stock_toupper(initials);
     int hashIndex = hashtable->hash_function(stocks, initials);
     stocks[hashIndex] = new Stock(name, initials, wkn);
+    (*name_initials)[name] = initials;
+    (*this->initials).insert(initials);
+    stocksCount++;
 }
 
-Stock* Manager::search_stock(int searchType, std::string searchKey){
-    if((SEARCH_TYPE)searchType == BY_NAME) searchKey = get_initials(searchKey);
-    return hashtable->find_obj(stocks, searchKey);
-}
-
-std::string Manager::get_initials(std::string name)
+Stock* Manager::search_stock(std::string term)
 {
-    char initials[5];
-    if(name.length() > 3)
-    {
-        float position = 0;
-        for(int i = 0; i < std::sqrt(name.length()); i++)
-        {
-            initials[i] = name[name.length() * position];
-            position += 0.25;
-        }
+    term = stock_toupper(term);
+    if ((*name_initials).find(term) != (*name_initials).end())
+        term = (*name_initials)[term];
 
-        return initials;
-    }
-    return name;
+    return hashtable->find_obj(stocks, term);
 }
 
-
+//std::string Manager::get_initials(std::string name)
+//{
+//    if(name.length() <= 3) return name;
+//
+//    char initials[5];
+//    float position = 0;
+//    for(int i = 0; i < std::sqrt(name.length()); i++)
+//    {
+//        initials[i] = name[name.length() * position];
+//        position += 0.25;
+//    }
+//    return initials;
+//}
 
 std::string Manager::stock_toupper(std::string characters)
 {
@@ -53,4 +61,23 @@ std::string Manager::stock_toupper(std::string characters)
         characters[i] = std::toupper(characters[i]);
 
     return characters;
+}
+
+void Manager::print_stock(Stock* stock)
+{
+    std::cout << "\n";
+    std::cout << "Name: " << stock->get_name() << std::endl;
+    std::cout << "Initials: " << stock->get_initials() << std::endl;
+    std::cout << "WKN: " << stock->get_wkn() << std::endl;
+    std::cout << "\n";
+}
+
+bool Manager::name_exists(std::string name){
+    name = stock_toupper(name);
+    return (*name_initials).find(name) != (*name_initials).end();
+}
+
+bool Manager::initials_exists(std::string initials){
+    initials = stock_toupper(initials);
+    return (*this->initials).find(initials) != (*this->initials).end();
 }

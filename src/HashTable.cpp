@@ -2,10 +2,10 @@
 #include <iostream>
 
 
-HashTable::HashTable(int tSize)
+HashTable::HashTable(int size)
 {
 
-    tableSize = tSize;
+    this->size = size;
 }
 
 HashTable::~HashTable()
@@ -15,11 +15,11 @@ HashTable::~HashTable()
 
 int HashTable::quadrating_probing(Stock** arr, int hashIndex)
 {
-    int attempts = 1, currIndex = hashIndex + 1;
+    int attempts = 1, currIndex = (hashIndex + 1) % size;
     while(arr[currIndex] != nullptr)
     {
         attempts++;
-        currIndex = hashIndex + (attempts * attempts);
+        currIndex = (hashIndex + (attempts * attempts) % size);
     }
     return currIndex;
 }
@@ -34,21 +34,22 @@ int HashTable::get_ascii_sum(std::string characters)
 
 int HashTable::hash_function(Stock** arr, std::string key)
 {
-    int hashIndex = get_ascii_sum(key) % tableSize;
+    int hashIndex = get_ascii_sum(key) % size;
     if(arr[hashIndex] == nullptr) return hashIndex;
     return quadrating_probing(arr, hashIndex);
 }
 
 Stock* HashTable::find_obj(Stock** arr, std::string key)
 {
-    int hashIndex = get_ascii_sum(key) % tableSize;
+    int hashIndex = get_ascii_sum(key) % size;
+    if(arr[hashIndex] == nullptr) return nullptr;
     if(arr[hashIndex]->get_initials() == key || arr[hashIndex]->get_name() == key) return arr[hashIndex];
-    int attempts = 1, currIndex = hashIndex + 1;
-    while(arr[currIndex]->get_initials() != key )
+    int attempts = 1, currIndex = (hashIndex + 1) % size;
+    while(arr[hashIndex]->get_initials() == key || arr[hashIndex]->get_name() == key)
     {
         attempts++;
-        currIndex = hashIndex + (attempts * attempts);
-        if(currIndex > tableSize) return nullptr;
+        currIndex = (hashIndex + (attempts * attempts) % size);
+        if(currIndex > size) return nullptr;
     }
     return arr[currIndex];
 }

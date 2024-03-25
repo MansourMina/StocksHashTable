@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "Manager.h"
+#include <limits>
 
 enum MENU
 {
@@ -14,7 +15,7 @@ enum MENU
     QUIT
 };
 
-void menu_input(int &input);
+bool menu_input(int &input);
 void action(Manager* manager, int input);
 void add_stock_input(std::string &name, std::string &wkn);
 
@@ -25,7 +26,7 @@ int main()
     int input;
     do
     {
-        menu_input(input);
+        if(!menu_input(input)) continue;
         action(manager, input);
     }
     while(input != QUIT);
@@ -33,42 +34,94 @@ int main()
     return 0;
 }
 
-void menu_input(int &input)
+bool valid_input(int input)
+{
+
+    switch(input)
+    {
+    case ADD:
+    case DELETE:
+    case IMPORT:
+    case SEARCH:
+    case PLOT:
+    case SAVE:
+    case LOAD:
+    case QUIT:
+        return true;
+    default:
+        return false;
+    }
+}
+
+bool menu_input(int &input)
 {
     std::cout << "ADD[1] PRINT[2] DELETE[2] IMPORT[3] SEARCH[4] PLOT[5] SAVE[6] LOAD[7] QUIT[8]: ";
-    std::cin >> input;
+    if (!(std::cin >> input))
+    {
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        return false;
+    }
+    return valid_input(input);
 }
 
-void add_stock_input(std::string &name, std::string &wkn)
+void add_stock_input(Manager* manager, std::string &name, std::string &initials, std::string &wkn)
 {
-    std::cout << "Enter stock name: ";
-    std::cin >> name;
-    std::cout << "Enter stock WKN: ";
-    std::cin >> wkn;
-}
-
-void search_stock_input(int &searchType, std::string &searchName)
-{
-
-    std::cout << "Search by Name[1] Initials[2]: ";
-    std::cin >> searchType;
     while(1)
     {
-        switch(searchType)
+        std::cout << "Enter stock name: ";
+        std::cin >> name;
+        if(name.length() < 5)
         {
-        case SEARCH_TYPE::BY_NAME:
-            std::cout << "Name: ";
-            break;
-        case SEARCH_TYPE::BY_INITIALS:
-            std::cout << "Initials: ";
-            break;
-        default:
+            std::cout << "The stock name must be at least 5 characters long!" << std::endl;
+            continue;
+        }
+        if(manager->name_exists(name))
+        {
+            std::cout << "Stock already exists! " << std::endl;
             continue;
         }
         break;
     }
 
-    std::cin >> searchName;
+    while(1)
+    {
+        std::cout << "Enter stock initials: ";
+        std::cin >> initials;
+        if(initials.length() < 3)
+        {
+            std::cout << "The stock initials must be at least 3 characters long!" << std::endl;
+            continue;
+        }
+        if(manager->initials_exists(initials))
+        {
+            std::cout << "Initials already exists! " << std::endl;
+            continue;
+        }
+        break;
+    }
+
+
+    do
+    {
+        std::cout << "Enter stock WKN: ";
+        std::cin >> wkn;
+        if(wkn.length() >= 10) break;
+        std::cout << "The stock wkn must be at least 10 characters long!" << std::endl;
+    }
+    while(1);
+
+}
+
+void search_stock_input(std::string &searchName)
+{
+    do
+    {
+        std::cout << "Search: ";
+        std::cin >> searchName;
+        if(searchName.length() > 0) break;
+    }
+    while(1);
 }
 
 void action(Manager* manager, int input)
@@ -77,9 +130,9 @@ void action(Manager* manager, int input)
     {
     case ADD:
     {
-        std::string name, wkn;
-        add_stock_input(name, wkn);
-        manager->add_stock(name, wkn);
+        std::string name,initials, wkn;
+        add_stock_input(manager, name,initials, wkn);
+        manager->add_stock(name,initials, wkn);
         break;
     }
     case DELETE:
@@ -95,12 +148,10 @@ void action(Manager* manager, int input)
     case SEARCH:
     {
         std::string searchName;
-        int searchType;
-        search_stock_input(searchType, searchName);
-        Stock* foundStock = manager->search_stock(searchType, searchName);
-        std::cout << "Name: " << foundStock->get_name() << std::endl;
-        std::cout << "Initials: " << foundStock->get_initials() << std::endl;
-        std::cout << "WKN: " << foundStock->get_wkn() << std::endl;
+        search_stock_input(searchName);
+        Stock* foundStock = manager->search_stock(searchName);
+        if(foundStock == nullptr) std::cout << "Stock not found!" << std::endl;
+        else manager->print_stock(foundStock);
         break;
     }
     case PLOT:
@@ -121,10 +172,11 @@ void action(Manager* manager, int input)
     }
     case QUIT:
     {
-        std::cout << "QUIT" << std::endl;
         break;
     }
     default:
         break;
     }
+
+
 }
