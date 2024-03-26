@@ -39,17 +39,17 @@ int HashTable::hash_function(Stock** arr, std::string key)
     return quadrating_probing(arr, hashIndex);
 }
 
-Stock* HashTable::find_obj(Stock** arr, std::string key)
+int HashTable::find_hash_index(Stock** arr, std::string key)
 {
     int hashIndex = get_ascii_sum(key) % size;
-    if(arr[hashIndex] == nullptr) return nullptr;
-    if(arr[hashIndex]->get_initials() == key || arr[hashIndex]->get_name() == key) return arr[hashIndex];
+    if(arr[hashIndex] == nullptr) return -1;
+    if(arr[hashIndex]->get_initials() == key || arr[hashIndex]->get_name() == key) return hashIndex;
     int attempts = 1, currIndex = (hashIndex + 1) % size;
     while(arr[hashIndex]->get_initials() == key || arr[hashIndex]->get_name() == key)
     {
         attempts++;
         currIndex = (hashIndex + (attempts * attempts) % size);
-        if(currIndex > size) return nullptr;
+        if(currIndex > size) return -1;
     }
-    return arr[currIndex];
+    return currIndex;
 }

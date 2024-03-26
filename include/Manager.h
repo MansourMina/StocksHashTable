@@ -29,7 +29,9 @@ public:
     std::unordered_set<std::string>* initials;
     bool name_exists(std::string name);
     bool initials_exists(std::string initials);
-
+    void del_stock(std::string term);
+    void del_map_initials(std::string key);
+    void del_map_name_initials(std::string key);
 private:
     int stocksCount;
 };

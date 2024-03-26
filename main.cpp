@@ -55,7 +55,7 @@ bool valid_input(int input)
 
 bool menu_input(int &input)
 {
-    std::cout << "ADD[1] PRINT[2] DELETE[2] IMPORT[3] SEARCH[4] PLOT[5] SAVE[6] LOAD[7] QUIT[8]: ";
+    std::cout << "ADD[1] DELETE[2] IMPORT[3] SEARCH[4] PLOT[5] SAVE[6] LOAD[7] QUIT[8]: ";
     if (!(std::cin >> input))
     {
         std::cin.clear();
@@ -124,6 +124,17 @@ void search_stock_input(std::string &searchName)
     while(1);
 }
 
+void del_stock_input(std::string &term)
+{
+    do
+    {
+        std::cout << "Stock: ";
+        std::cin >> term;
+        if(term.length() > 0) break;
+    }
+    while(1);
+}
+
 void action(Manager* manager, int input)
 {
     switch(input)
@@ -137,7 +148,9 @@ void action(Manager* manager, int input)
     }
     case DELETE:
     {
-        std::cout << "DELETE" << std::endl;
+        std::string term;
+        del_stock_input(term);
+        manager->del_stock(term);
         break;
     }
     case IMPORT:

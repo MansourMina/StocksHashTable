@@ -36,10 +36,12 @@
 		</Compiler>
 		<Unit filename="include/HashTable.h" />
 		<Unit filename="include/Manager.h" />
+		<Unit filename="include/MarketData.h" />
 		<Unit filename="include/Stock.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/HashTable.cpp" />
 		<Unit filename="src/Manager.cpp" />
+		<Unit filename="src/MarketData.cpp" />
 		<Unit filename="src/Stock.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

@@ -4,22 +4,23 @@
 	<string>
 	<iostream>
 
-1711315269 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\stock.h
+1711413123 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\stock.h
 	<string>
+	"MarketData.h"
 
-1711408266 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\manager.cpp
+1711412484 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\manager.cpp
 	"Manager.h"
 	<iostream>
 	<cmath>
 
-1711408139 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\manager.h
+1711411977 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\manager.h
 	<string>
 	"Stock.h"
 	"HashTable.h"
 	<unordered_map>
 	<unordered_set>
 
-1711408208 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\main.cpp
+1711410260 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\main.cpp
 	<iostream>
 	<string>
 	"Manager.h"
@@ -32,11 +33,17 @@
 	"Stock.h"
 	<string>
 
-1711407838 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\hashtable.h
+1711410542 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\hashtable.h
 	"Stock.h"
 	<string>
 
-1711407855 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\hashtable.cpp
+1711410624 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\hashtable.cpp
 	"HashTable.h"
 	<iostream>
+
+1711412484 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\marketdata.h
+	<string>
+
+1711412484 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\marketdata.cpp
+	"MarketData.h"
 

@@ -16,11 +16,13 @@ Manager::~Manager()
     for(int i = 0; i < stocksCount; i++)
         delete stocks[i];
     delete name_initials;
+    delete initials;
 }
 
 void Manager::add_stock(std::string name,std::string initials, std::string wkn)
 {
-    if(stocksCount + 1 >= STOCKS_SIZE){
+    if(stocksCount + 1 >= STOCKS_SIZE)
+    {
         std::cerr << "Failed: Maximum stock capacity reached!" << std::endl;
         return;
     }
@@ -32,13 +34,44 @@ void Manager::add_stock(std::string name,std::string initials, std::string wkn)
     stocksCount++;
 }
 
+void Manager::del_stock(std::string term)
+{
+    term = stock_toupper(term);
+    if ((*name_initials).find(term) != (*name_initials).end())
+        term = (*name_initials)[term];
+
+    int hashIndex = hashtable->find_hash_index(stocks, term);
+    if(hashIndex == -1)
+    {
+        std::cerr << "Failed: Stock not found!" << std::endl;
+        return;
+    }
+    del_map_initials(stocks[hashIndex]->get_initials());
+    del_map_name_initials(stocks[hashIndex]->get_name());
+    delete stocks[hashIndex];
+    stocks[hashIndex] = nullptr;
+    std::cout << "Success: Stock deleted!" << std::endl;
+
+}
+
+void Manager::del_map_initials(std::string key){
+
+    (*initials).erase((*initials).find(key));
+}
+
+void Manager::del_map_name_initials(std::string key){
+
+    (*name_initials).erase(key);
+}
+
 Stock* Manager::search_stock(std::string term)
 {
     term = stock_toupper(term);
     if ((*name_initials).find(term) != (*name_initials).end())
         term = (*name_initials)[term];
 
-    return hashtable->find_obj(stocks, term);
+    int found_hashIndex = hashtable->find_hash_index(stocks, term);
+    return found_hashIndex == -1 ? nullptr:stocks[found_hashIndex];
 }
 
 //std::string Manager::get_initials(std::string name)
@@ -72,12 +105,14 @@ void Manager::print_stock(Stock* stock)
     std::cout << "\n";
 }
 
-bool Manager::name_exists(std::string name){
+bool Manager::name_exists(std::string name)
+{
     name = stock_toupper(name);
     return (*name_initials).find(name) != (*name_initials).end();
 }
 
-bool Manager::initials_exists(std::string initials){
+bool Manager::initials_exists(std::string initials)
+{
     initials = stock_toupper(initials);
     return (*this->initials).find(initials) != (*this->initials).end();
 }
