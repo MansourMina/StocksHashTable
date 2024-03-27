@@ -135,6 +135,26 @@ void del_stock_input(std::string &term)
     while(1);
 }
 
+void data_stock_input(Manager* manager, std::string& file, std::string& stockName)
+{
+    while(1)
+    {
+        std::cout << "Stock: ";
+        std::cin >> stockName;
+        if(!manager->stock_exists(stockName)){
+            std::cerr << "Failed: Stock not found!" << std::endl;
+            continue;
+        }
+        if(stockName.length() > 0) break;
+    }
+
+    do{
+        std::cout << "File: ";
+        std::cin >> file;
+        if(file.length() > 0) break;
+    }while(1);
+}
+
 void action(Manager* manager, int input)
 {
     switch(input)
@@ -155,7 +175,9 @@ void action(Manager* manager, int input)
     }
     case IMPORT:
     {
-        std::cout << "IMPORT" << std::endl;
+        std::string file, stockName;
+        data_stock_input(manager, file, stockName);
+        manager->add_market_data(file, stockName);
         break;
     }
     case SEARCH:

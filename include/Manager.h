@@ -6,11 +6,26 @@
 #include "HashTable.h"
 #include <unordered_map>
 #include <unordered_set>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <algorithm>
 
 enum SEARCH_TYPE
 {
     BY_NAME= 1,
     BY_INITIALS
+};
+
+struct file_data
+{
+    std::string date;
+    double open;
+    double high;
+    double low;
+    double close;
+    double adjClose;
+    double volume;
 };
 
 class Manager
@@ -32,8 +47,15 @@ public:
     void del_stock(std::string term);
     void del_map_initials(std::string key);
     void del_map_name_initials(std::string key);
+    void add_market_data(std::string file, std::string term);
+    bool stock_exists(std::string term);
+
 private:
     int stocksCount;
+    void import_data(std::string file, Stock* stock);
+    int count_file_lines(std::ifstream& file);
+    bool compareByDate(const file_data& a, const file_data& b);
+    void sort_data(std::string& filename);
 };
 
 #endif // MANAGER_H

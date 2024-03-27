@@ -2,6 +2,7 @@
 #define MARKETDATA_H
 #include <string>
 
+
 class MarketData
 {
 public:

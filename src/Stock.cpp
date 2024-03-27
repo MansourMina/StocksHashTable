@@ -37,13 +37,22 @@ void Stock::add_market_data(std::string date,
                             double volume,
                             double adjClose)
 {
-    if(marketDataCount + 1 > MAXIMUM_MARKET_DATA)
-    {
-        std::cerr << "Failed: Maximum market data capacity reached!" << std::endl;
-        return;
-    }
+    if(marketDataCount + 1 > MAXIMUM_MARKET_DATA) return;
     marketData[marketDataCount++] = new MarketData(date, open, high, low, close, volume, adjClose);
+}
 
+int Stock::get_market_data_capacity(){
+    return MAXIMUM_MARKET_DATA;
+}
+
+int Stock::get_market_data_count(){
+    return marketDataCount;
+}
+
+void Stock::print_market_data(){
+    for(int i = 0; i < marketDataCount; i++){
+        std::cout << marketData[i]->get_date() << std::endl;
+    }
 }
 
 

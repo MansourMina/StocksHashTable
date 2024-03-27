@@ -19,11 +19,15 @@ public:
                             double close,
                             double volume,
                             double adjClose);
+    void print_market_data();
+    int get_market_data_capacity();
+    int get_market_data_count();
 private:
     std::string name;
     std::string wkn;
     std::string initials;
     int marketDataCount;
+
 };
 
 #endif // STOCK_H

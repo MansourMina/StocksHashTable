@@ -8,7 +8,13 @@ MarketData::MarketData(std::string date,
                        double volume,
                        double adjClose)
 {
-    //ctor
+    this->date = date;
+    this->open = open;
+    this->high = high;
+    this->low = low;
+    this->close = close;
+    this->volume = volume;
+    this->adjClose = adjClose;
 }
 
 MarketData::~MarketData()
