@@ -18,7 +18,7 @@ public:
     double get_open();
     double get_high();
     double get_low();
-    double get_close();
+    double get_close() const;
     double get_volume();
     double get_adjClose();
 

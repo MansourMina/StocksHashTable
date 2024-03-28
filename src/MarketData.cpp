@@ -39,7 +39,7 @@ double MarketData::get_low()
 {
     return low;
 }
-double MarketData::get_close()
+double MarketData::get_close() const
 {
     return close;
 }

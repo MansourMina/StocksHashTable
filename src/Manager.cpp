@@ -76,6 +76,7 @@ Stock* Manager::search_stock(std::string term)
     return found_hashIndex == -1 ? nullptr:stocks[found_hashIndex];
 }
 
+
 //std::string Manager::get_initials(std::string name)
 //{
 //    if(name.length() <= 3) return name;
@@ -105,6 +106,8 @@ void Manager::print_stock(Stock* stock)
     std::cout << "Initials: " << stock->get_initials() << std::endl;
     std::cout << "WKN: " << stock->get_wkn() << std::endl;
     std::cout << "\n";
+    if(stock->get_market_data_count() > 0)
+        std::cout << stock->get_market_data() << std::endl;
 }
 
 bool Manager::name_exists(std::string name)
@@ -119,23 +122,6 @@ bool Manager::initials_exists(std::string initials)
     return (*this->initials).find(initials) != (*this->initials).end();
 }
 
-void Manager::add_market_data(std::string file, std::string term)
-{
-    term = stock_toupper(term);
-    if ((*name_initials).find(term) != (*name_initials).end())
-        term = (*name_initials)[term];
-
-    int hashIndex = hashtable->find_hash_index(stocks, term);
-    if(hashIndex == -1)
-    {
-        std::cerr << "Failed: Stock not found!" << std::endl;
-        return;
-    }
-    sort_data(file);
-    import_data(file, stocks[hashIndex]);
-    stocks[hashIndex]->print_market_data();
-}
-
 bool Manager::stock_exists(std::string term)
 {
     term = stock_toupper(term);
@@ -146,90 +132,190 @@ bool Manager::stock_exists(std::string term)
     return !(hashIndex == -1);
 }
 
-
-bool Manager::compareByDate(const file_data& a, const file_data& b)
+void Manager::add_market_data(std::string file, std::string term, int importType)
 {
-    return a.date > b.date;
-}
+    Stock* stock = search_stock(term);
 
-void Manager::sort_data(std::string& filename)
-{
-    std::ifstream infile(filename);
-    std::vector<file_data> data;
-    std::string line;
-    getline(infile, line); // Skip header
-    while (std::getline(infile, line))
-    {
-        std::stringstream ss(line);
-        file_data fdata;
-        std::getline(ss, fdata.date, ',');
-        ss >> fdata.open >> fdata.high >> fdata.low >> fdata.close >> fdata.adjClose >> fdata.volume;
-        data.push_back(fdata);
-    }
-    infile.close();
-
-    // Sort data
-    std::sort(data.begin(), data.end(), [this](const file_data& a, const file_data& b)
-    {
-        return compareByDate(a, b);
-    });
-
-    // Write sorted data back to file
-    std::ofstream outfile(filename);
-
-    outfile << "Date,Open,High,Low,Close,AdjClose,Volume\n";
-    for (int i = 0; i < data.size(); ++i)
-    {
-        outfile << data[i].date << "," << data[i].open << "," << data[i].high << "," << data[i].low << "," << data[i].close << "," << data[i].adjClose << "," << data[i].volume << "\n";
-    }
-    outfile.close();
-}
-
-void Manager::import_data(std::string file, Stock* stock)
-{
-
-    std::string date,open,high,low,close,adjClose,volume;
-    std::ifstream stockData;
-    stockData.open(file);
-    if (!stockData.is_open())
+    std::ifstream input_file(file);
+    if (!input_file)
     {
         std::cerr << "Error: Failed to open file!" << std::endl;
         return;
     }
 
-    std::string column;
+    std::vector<file_data> data;
+    read_data(input_file, data);
+    sort_data(data, 0, data.size() - 1);
+    import_data(data, stock, importType);
+}
 
-    int counter= 0, beginWith = 1;
-    bool dataLost = false;
 
-    while (getline(stockData,column))
+void Manager::sort_data(std::vector<file_data>& data, int low, int high)
+{
+    if (low < high)
     {
-        if(counter >= beginWith)
+        int pivotIndex = low + (high - low) / 2;
+        file_data pivot = data[pivotIndex];
+        int i = low;
+        int j = high;
+        while (i <= j)
         {
-            std::stringstream ss(column);
-            std::getline(ss, date, ',');
-            std::getline(ss, open, ',');
-            std::getline(ss, high, ',');
-            std::getline(ss, low, ',');
-            std::getline(ss, close, ',');
-            std::getline(ss, adjClose, ',');
-            std::getline(ss, volume, ',');
-
-            double openValue = (open.empty() ? 0.00 : std::stod(open));
-            double highValue = (high.empty() ? 0.00 : std::stod(high));
-            double lowValue = (low.empty() ? 0.00 : std::stod(low));
-            double closeValue = (close.empty() ? 0.00 : std::stod(close));
-            double adjCloseValue = (adjClose.empty() ? 0.00 : std::stod(adjClose));
-            double volumeValue = (volume.empty() ? 0.00 : std::stod(volume));
-
-            dataLost = counter > stock->get_market_data_capacity();
-            if(dataLost) break;
-            stock->add_market_data(date, openValue, highValue, lowValue, closeValue, volumeValue, adjCloseValue);
+            while (data[i].date > pivot.date)
+                i++;
+            while (pivot.date > data[j].date)
+                j--;
+            if (i <= j)
+            {
+                std::swap(data[i], data[j]);
+                i++;
+                j--;
+            }
         }
-        counter++;
+        sort_data(data, low, j);
+        sort_data(data, i, high);
     }
-    std::cout << "Market data added to Stock '" << stock->get_name() << "': " << stock->get_market_data_count() << std::endl;
+}
+
+double Manager::convert_to_double(std::string number)
+{
+    return number.empty() ? 0.00: std::stod(number);
+}
+
+void Manager::read_data(std::ifstream& input_file, std::vector<file_data>& data)
+{
+    if (input_file)
+    {
+        std::string line;
+        int lineCounter= 0, beginWith = 1;
+        while (std::getline(input_file, line))
+        {
+            if(lineCounter >= beginWith)
+            {
+                std::stringstream ss(line);
+                file_data currData;
+                std::string column;
+                std::getline(ss, currData.date, ',');
+                std::getline(ss, column, ',');
+                currData.open =  convert_to_double(column);
+                std::getline(ss, column, ',');
+                currData.high = convert_to_double(column);
+                std::getline(ss, column, ',');
+                currData.low = convert_to_double(column);
+                std::getline(ss, column, ',');
+                currData.close = convert_to_double(column);
+                std::getline(ss, column, ',');
+                currData.adjClose = convert_to_double(column);
+                std::getline(ss, column);
+                currData.volume = convert_to_double(column);
+                data.push_back(currData);
+            }
+            lineCounter++;
+        }
+        input_file.close();
+    }
+}
+
+void Manager::import_data(std::vector<file_data>& data, Stock* stock, int importType )
+{
+    if(importType == IMPORT_TYPE::REPLACING)
+        stock->delete_market_data();
+
+    bool dataLost = false, dublicates= false;
+    int added= 0;
+    int capacity = stock->get_market_data_capacity() - stock->get_market_data_count();
+    for (int dataCounter = 0; dataCounter < data.size(); dataCounter++)
+    {
+        const file_data& currData = data[dataCounter];
+        dataLost =  dataCounter >= capacity;
+        if(dataLost) break;
+        if(stock->market_data_exists(currData.date))
+        {
+            dublicates= true;
+            continue;
+        }
+        stock->add_market_data(currData.date, currData.open, currData.high, currData.low, currData.close, currData.volume, currData.adjClose);
+        added++;
+    }
+    std::cout << "\n";
+    std::cout << "Market data added to Stock '" << stock->get_name() << "': " << added << std::endl;
     if(dataLost) std::cerr << "Warning: Market data lost. Exceeded maximum capacity of " << stock->get_market_data_capacity() << std::endl;
-    stockData.close();
+    if(dublicates) std::cerr << "Warning: Duplicate Market data detected." << std::endl;
+    std::cout << "\n";
+}
+
+double Manager::get_max_closed(Stock* stock)
+{
+    if(stock->get_market_data_count() <= 0) return 0.00;
+    double currentMax = stock->marketData[0]->get_close();
+    for(int i = 0; i < stock->get_market_data_count(); i++)
+    {
+        if(stock->marketData[i]->get_close() > currentMax)
+        {
+            currentMax = stock->marketData[i]->get_close();
+        }
+    }
+    return currentMax;
+}
+
+double Manager::get_min_closed(Stock* stock)
+{
+    if(stock->get_market_data_count() <= 0) return 0.00;
+    double currentMin= stock->marketData[0]->get_close();
+    for(int i = 0; i < stock->get_market_data_count(); i++)
+    {
+        if(stock->marketData[i]->get_close() < currentMin)
+        {
+            currentMin = stock->marketData[i]->get_close();
+        }
+    }
+    return currentMin;
+}
+
+void Manager::plot_market_data(Stock* stock)
+{
+
+    double maxClose = get_max_closed(stock);
+    double minClose = get_min_closed(stock);
+    int dataCount = stock->get_market_data_count();
+
+    std::vector<double> closeData;
+    for(int i = 0; i < dataCount; i++)
+    {
+        closeData.push_back(stock->marketData[i]->get_close());
+    }
+    std::sort(closeData.begin(), closeData.end());
+    std::reverse(closeData.begin(), closeData.end());
+
+    std::cout << "Close" << std::endl;
+
+    for(int c = 0; c < closeData.size(); c++)
+    {
+        std::cout << std::fixed << std::setprecision(2) << closeData[c] << " |";
+        for(int i = 0; i < dataCount; i++)
+        {
+            std::istringstream iss(stock->marketData[i]->get_date());
+
+            double currStockClose = stock->marketData[i]->get_close();
+            std::cout << (currStockClose >= closeData[c] ? "*  " : "   ");
+        }
+        std::cout << "\n";
+    }
+
+    for(int j = 0; j < std::to_string(maxClose).length() - 2; j++)
+            std::cout << "-";
+    for(int i = 0; i < dataCount; i++)
+    {
+
+        std::istringstream iss(stock->marketData[i]->get_date());
+        int year, month, day;
+        char dash;
+        iss >> year >> dash >> month >> dash >> day;
+        std::cout  << (month < 10 ? "0" + std::to_string(month) : std::to_string(month)) << "-";
+    }
+    std::cout << "----Month" << std::endl;
+
 
 }
+
+
+

@@ -3,6 +3,8 @@
 #include <string>
 #include "MarketData.h"
 #define MAXIMUM_MARKET_DATA 30
+#include <sstream>
+#include <iomanip>
 
 class Stock{
 public:
@@ -19,9 +21,11 @@ public:
                             double close,
                             double volume,
                             double adjClose);
-    void print_market_data();
+    std::string get_market_data();
     int get_market_data_capacity();
     int get_market_data_count();
+    void delete_market_data();
+    bool market_data_exists(std::string date);
 private:
     std::string name;
     std::string wkn;

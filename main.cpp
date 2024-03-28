@@ -135,24 +135,43 @@ void del_stock_input(std::string &term)
     while(1);
 }
 
-void data_stock_input(Manager* manager, std::string& file, std::string& stockName)
+void data_stock_input(Manager* manager, std::string& file, std::string& stockName, int& type)
 {
     while(1)
     {
         std::cout << "Stock: ";
         std::cin >> stockName;
-        if(!manager->stock_exists(stockName)){
+        if(!manager->stock_exists(stockName))
+        {
             std::cerr << "Failed: Stock not found!" << std::endl;
             continue;
         }
-        if(stockName.length() > 0) break;
+        break;
     }
 
-    do{
+    do
+    {
         std::cout << "File: ";
         std::cin >> file;
         if(file.length() > 0) break;
-    }while(1);
+    }
+    while(1);
+    Stock* stock = manager->search_stock(stockName);
+    if(stock->get_market_data_count() != 0)
+    {
+        do
+        {
+            std::cout << "Replacing[1] or Adding[2] data: ";
+            if (!(std::cin >> type))
+            {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            }
+            if(type >= 1 && type <= 2) break;
+        }
+        while(1);
+    }
+
 }
 
 void action(Manager* manager, int input)
@@ -176,8 +195,9 @@ void action(Manager* manager, int input)
     case IMPORT:
     {
         std::string file, stockName;
-        data_stock_input(manager, file, stockName);
-        manager->add_market_data(file, stockName);
+        int type;
+        data_stock_input(manager, file, stockName, type);
+        manager->add_market_data(file, stockName, type);
         break;
     }
     case SEARCH:
@@ -191,8 +211,11 @@ void action(Manager* manager, int input)
     }
     case PLOT:
     {
-
-        std::cout << "PLOT" << std::endl;
+        std::string searchName;
+        search_stock_input(searchName);
+        Stock* foundStock = manager->search_stock(searchName);
+        if(foundStock == nullptr) std::cout << "Stock not found!" << std::endl;
+        else manager->plot_market_data(foundStock);
         break;
     }
     case SAVE:
@@ -206,9 +229,6 @@ void action(Manager* manager, int input)
         break;
     }
     case QUIT:
-    {
-        break;
-    }
     default:
         break;
     }

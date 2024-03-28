@@ -17,6 +17,11 @@ enum SEARCH_TYPE
     BY_INITIALS
 };
 
+enum IMPORT_TYPE{
+    REPLACING=1,
+    ADDING
+};
+
 struct file_data
 {
     std::string date;
@@ -47,15 +52,21 @@ public:
     void del_stock(std::string term);
     void del_map_initials(std::string key);
     void del_map_name_initials(std::string key);
-    void add_market_data(std::string file, std::string term);
+    void add_market_data(std::string file, std::string term, int importType);
     bool stock_exists(std::string term);
+    void plot_market_data(Stock* stock);
 
 private:
     int stocksCount;
-    void import_data(std::string file, Stock* stock);
+    void import_data(std::vector<file_data>& data, Stock* stock, int importType);
     int count_file_lines(std::ifstream& file);
-    bool compareByDate(const file_data& a, const file_data& b);
-    void sort_data(std::string& filename);
+    void sort_data(std::vector<file_data>& data, int low, int high);
+    void read_data(std::ifstream& input_file, std::vector<file_data>& data);
+    double convert_to_double(std::string number);
+    double get_max_closed(Stock* stock);
+    double get_min_closed(Stock* stock);
+
+
 };
 
 #endif // MANAGER_H
