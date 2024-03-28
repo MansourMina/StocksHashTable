@@ -17,7 +17,8 @@ enum SEARCH_TYPE
     BY_INITIALS
 };
 
-enum IMPORT_TYPE{
+enum IMPORT_TYPE
+{
     REPLACING=1,
     ADDING
 };
@@ -55,6 +56,7 @@ public:
     void add_market_data(std::string file, std::string term, int importType);
     bool stock_exists(std::string term);
     void plot_market_data(Stock* stock);
+    void serialize_data();
 
 private:
     int stocksCount;

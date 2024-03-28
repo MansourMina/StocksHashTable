@@ -30,7 +30,7 @@ void Manager::add_stock(std::string name,std::string initials, std::string wkn)
     int hashIndex = hashtable->hash_function(stocks, initials);
     stocks[hashIndex] = new Stock(name, initials, wkn);
     (*name_initials)[name] = initials;
-    (*this->initials).insert(initials);
+    this->initials->insert(initials);
     stocksCount++;
 }
 
@@ -50,20 +50,22 @@ void Manager::del_stock(std::string term)
     del_map_name_initials(stocks[hashIndex]->get_name());
     delete stocks[hashIndex];
     stocks[hashIndex] = nullptr;
+    stocksCount--;
     std::cout << "Success: Stock deleted!" << std::endl;
+
 
 }
 
 void Manager::del_map_initials(std::string key)
 {
 
-    (*initials).erase((*initials).find(key));
+    initials->erase(initials->find(key));
 }
 
 void Manager::del_map_name_initials(std::string key)
 {
 
-    (*name_initials).erase(key);
+    name_initials->erase(key);
 }
 
 Stock* Manager::search_stock(std::string term)
@@ -302,7 +304,7 @@ void Manager::plot_market_data(Stock* stock)
     }
 
     for(int j = 0; j < std::to_string(maxClose).length() - 2; j++)
-            std::cout << "-";
+        std::cout << "-";
     for(int i = 0; i < dataCount; i++)
     {
 
@@ -312,8 +314,33 @@ void Manager::plot_market_data(Stock* stock)
         iss >> year >> dash >> month >> dash >> day;
         std::cout  << (month < 10 ? "0" + std::to_string(month) : std::to_string(month)) << "-";
     }
-    std::cout << "----Month" << std::endl;
+    std::cout << "      Month" << std::endl;
 
+}
+
+void Manager::serialize_data()
+{
+    const char* downloadsDir = std::getenv("USERPROFILE");
+    if (downloadsDir == nullptr)
+    {
+        std::cout << "Failed: Could not save file. Please try again!" << std::endl;
+        return;
+    }
+    std::string filename = std::string(downloadsDir) + "\\Downloads\\Stocks_data.csv";
+    std::ofstream file(filename);
+    bool isEmpty = true;
+    if (file.is_open())
+    {
+        for (int i = 0; i < STOCKS_SIZE; ++i)
+        {
+            if(stocks[i] == nullptr) continue;
+            file << stocks[i]->serialize() << "\n";
+            file << stocks[i]->get_market_data() << "\n";
+            isEmpty = false;
+        }
+        file.close();
+    }
+    std::cout << (isEmpty ? "Error: No valid data found!":"Successfully saved stock data!") << std::endl;
 
 }
 

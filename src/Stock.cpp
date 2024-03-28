@@ -52,36 +52,50 @@ int Stock::get_market_data_count()
     return marketDataCount;
 }
 
-void Stock::delete_market_data(){
+void Stock::delete_market_data()
+{
     for(int m = 0; m < marketDataCount; m++)
         delete marketData[m];
     marketDataCount = 0;
 }
 
+
+
 std::string Stock::get_market_data()
 {
     std::stringstream ss;
-    ss << "Date | Open | High | Low | Close | Adj Close | Volume\n" << std::endl;
+    ss << "Date,Open,High,Low,Close,Adj Close,Volume" << std::endl;
     for(int i = 0; i < marketDataCount; i++)
     {
         MarketData* md = marketData[i];
-        ss << md->get_date() << " | "
-           << std::fixed << std::setprecision(2) << md->get_open() << " | "
-           << std::fixed << std::setprecision(2) << md->get_high() << " | "
-           << std::fixed << std::setprecision(2) << md->get_low() << " | "
-           << std::fixed << std::setprecision(2) << md->get_close() << " | "
-           << std::fixed << std::setprecision(2) << md->get_adjClose() << " | "
-           << std::fixed << std::setprecision(2) << md->get_volume()
+        ss << std::fixed << std::setprecision(6);
+        ss << md->get_date() << ","
+           << md->get_open() << ","
+           << md->get_high() << ","
+           << md->get_low() << ","
+           << md->get_close() << ","
+           << md->get_adjClose() << ","
+           << md->get_volume()
            << std::endl;
     }
     return ss.str();
 }
 
-bool Stock::market_data_exists(std::string date){
-    for(int d = 0; d < marketDataCount; d++){
+bool Stock::market_data_exists(std::string date)
+{
+    for(int d = 0; d < marketDataCount; d++)
+    {
         if(marketData[d]->get_date() == date) return true;
     }
     return false;
+}
+
+std::string Stock::serialize() const
+{
+    std::stringstream ss;
+
+    ss << name << "," << initials << "," << wkn;
+    return ss.str();
 }
 
 

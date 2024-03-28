@@ -135,6 +135,17 @@ void del_stock_input(std::string &term)
     while(1);
 }
 
+void save_stocks_input(std::string &fileName)
+{
+    do
+    {
+        std::cout << "Path: ";
+        std::cin >> fileName;
+        if(fileName.length() > 0) break;
+    }
+    while(1);
+}
+
 void data_stock_input(Manager* manager, std::string& file, std::string& stockName, int& type)
 {
     while(1)
@@ -220,7 +231,7 @@ void action(Manager* manager, int input)
     }
     case SAVE:
     {
-        std::cout << "SAVE" << std::endl;
+        manager->serialize_data();
         break;
     }
     case LOAD:

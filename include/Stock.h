@@ -6,7 +6,8 @@
 #include <sstream>
 #include <iomanip>
 
-class Stock{
+class Stock
+{
 public:
     Stock(std::string name, std::string initials, std::string wkn);
     ~Stock();
@@ -15,22 +16,24 @@ public:
     std::string get_initials();
     MarketData* marketData[MAXIMUM_MARKET_DATA];
     void add_market_data(std::string date,
-                            double open,
-                            double high,
-                            double low,
-                            double close,
-                            double volume,
-                            double adjClose);
+                         double open,
+                         double high,
+                         double low,
+                         double close,
+                         double volume,
+                         double adjClose);
     std::string get_market_data();
     int get_market_data_capacity();
     int get_market_data_count();
     void delete_market_data();
     bool market_data_exists(std::string date);
+    std::string serialize() const;
 private:
     std::string name;
     std::string wkn;
     std::string initials;
     int marketDataCount;
+
 
 };
 
