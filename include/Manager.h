@@ -10,7 +10,7 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
-#include <regex>
+
 
 enum SEARCH_TYPE
 {
@@ -80,6 +80,7 @@ public:
     void load_data(std::string filename);
 
     std::vector<int> storedIndexes;
+
 
 private:
     int stocksCount;

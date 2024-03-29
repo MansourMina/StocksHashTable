@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1711667954 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\stock.cpp
+1711728018 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\stock.cpp
 	"Stock.h"
 	<string>
 	<iostream>
@@ -10,12 +10,12 @@
 	<sstream>
 	<iomanip>
 
-1711727121 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\manager.cpp
+1711728573 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\manager.cpp
 	"Manager.h"
 	<iostream>
 	<cmath>
 
-1711727138 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\manager.h
+1711728573 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\manager.h
 	<string>
 	"Stock.h"
 	"HashTable.h"
@@ -25,9 +25,8 @@
 	<sstream>
 	<vector>
 	<algorithm>
-	<regex>
 
-1711727082 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\main.cpp
+1711728018 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\main.cpp
 	<iostream>
 	<string>
 	"Manager.h"

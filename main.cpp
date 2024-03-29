@@ -239,7 +239,6 @@ void action(Manager* manager, int input)
         std::string filename;
         std::cout << "File: ";
         std::cin >> filename;
-        std::cout << "Test";
         manager->load_data(filename);
         break;
     }

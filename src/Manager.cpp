@@ -240,6 +240,10 @@ void Manager::plot_market_data(Stock* stock)
 
     double maxClose = get_max_closed(stock);
     int dataCount = stock->get_market_data_count();
+    if(dataCount <= 0){
+        std::cout << "'" << stock->get_name() << "'" << " has no Market data yet!" << std::endl;
+        return;
+    }
 
     std::vector<double> closeData;
     for(int i = 0; i < dataCount; i++)
@@ -308,8 +312,17 @@ void Manager::save_data()
 
 bool Manager::is_date(std::string date)
 {
-    std::regex date_regex(R"(\d{4}-\d{2}-\d{2})");
-    return std::regex_match(date, date_regex);
+        if (date.length() != 10)
+            return false;
+        if (date[4] != '-' || date[7] != '-')
+            return false;
+        for (int i = 0; i < 10; ++i) {
+            if (i == 4 || i == 7)
+                continue;
+            if (!std::isdigit(date[i]))
+                return false;
+        }
+        return true;
 }
 
 void Manager::load_data(std::string filename)

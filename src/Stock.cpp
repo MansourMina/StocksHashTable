@@ -38,7 +38,7 @@ void Stock::add_market_data(std::string date,
                             double close,
                             double adjClose,
                             double volume
-                            )
+                           )
 {
     if(marketDataCount + 1 > MAXIMUM_MARKET_DATA) return;
     marketData[marketDataCount++] = new MarketData(date, open, high, low, close, adjClose, volume);
@@ -66,20 +66,16 @@ void Stock::delete_market_data()
 std::string Stock::get_market_data()
 {
     std::stringstream ss;
-    ss << "Date,Open,High,Low,Close,Adj Close,Volume" << std::endl;
-    for(int i = 0; i < marketDataCount; i++)
-    {
-        MarketData* md = marketData[i];
-        ss << std::fixed << std::setprecision(6);
-        ss << md->get_date() << ","
-           << md->get_open() << ","
-           << md->get_high() << ","
-           << md->get_low() << ","
-           << md->get_close() << ","
-           << md->get_adjClose() << ","
-           << md->get_volume()
-           << std::endl;
-    }
+    if(marketDataCount <= 0) return "";
+    MarketData* md = marketData[0];
+    ss << "Date: " << md->get_date() << "\n"
+       << "Open: " << md->get_open() << "\n"
+       << "High: " << md->get_high() << "\n"
+       << "Low: " << md->get_low() << "\n"
+       << "Close: " << md->get_close() << "\n"
+       << "Adj Close: " << md->get_adjClose() << "\n"
+       << "Volume: " << md->get_volume()
+       << std::endl;
     return ss.str();
 }
 
