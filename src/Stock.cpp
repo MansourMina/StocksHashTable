@@ -41,14 +41,14 @@ void Stock::add_market_data(std::string date,
                            )
 {
     if(marketDataCount + 1 > MAXIMUM_MARKET_DATA) return;
-    MarketData* newData = new MarketData(date, open, high, low, close, adjClose, volume);
-    int insertIndex = 0;
-    while (insertIndex < marketDataCount && marketData[insertIndex]->get_date() > newData->get_date())
-        insertIndex++;
-    for (int i = marketDataCount; i > insertIndex; i--)
+    marketData[marketDataCount++] = new MarketData(date, open, high, low, close, adjClose, volume);
+    for (int i = marketDataCount - 1; i >= 1; --i)
+    {
+        if (marketData[i]->get_date() <= marketData[i - 1]->get_date()) break;
+        MarketData* marketTemp = marketData[i];
         marketData[i] = marketData[i - 1];
-    marketData[insertIndex] = newData;
-    marketDataCount++;
+        marketData[i - 1] = marketTemp;
+    }
 }
 
 int Stock::get_market_data_capacity()
