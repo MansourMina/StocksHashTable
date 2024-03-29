@@ -71,9 +71,9 @@ void add_stock_input(Manager* manager, std::string &name, std::string &initials,
     {
         std::cout << "Enter stock name: ";
         std::cin >> name;
-        if(name.length() < 5)
+        if(name.length() < 3)
         {
-            std::cout << "The stock name must be at least 5 characters long!" << std::endl;
+            std::cout << "The stock name must be at least 3 characters long!" << std::endl;
             continue;
         }
         if(manager->name_exists(name))
@@ -88,9 +88,9 @@ void add_stock_input(Manager* manager, std::string &name, std::string &initials,
     {
         std::cout << "Enter stock initials: ";
         std::cin >> initials;
-        if(initials.length() < 3)
+        if(initials.length() < 2)
         {
-            std::cout << "The stock initials must be at least 3 characters long!" << std::endl;
+            std::cout << "The stock initials must be at least 2 characters long!" << std::endl;
             continue;
         }
         if(manager->initials_exists(initials))
@@ -106,8 +106,8 @@ void add_stock_input(Manager* manager, std::string &name, std::string &initials,
     {
         std::cout << "Enter stock WKN: ";
         std::cin >> wkn;
-        if(wkn.length() >= 10) break;
-        std::cout << "The stock wkn must be at least 10 characters long!" << std::endl;
+        if(wkn.length() >= 7) break;
+        std::cout << "The stock wkn must be at least 7 characters long!" << std::endl;
     }
     while(1);
 
@@ -146,7 +146,7 @@ void save_stocks_input(std::string &fileName)
     while(1);
 }
 
-void data_stock_input(Manager* manager, std::string& file, std::string& stockName, int& type)
+void data_stock_input(bool& validStock, Manager* manager, std::string& file, std::string& stockName, int& type)
 {
     while(1)
     {
@@ -155,7 +155,8 @@ void data_stock_input(Manager* manager, std::string& file, std::string& stockNam
         if(!manager->stock_exists(stockName))
         {
             std::cerr << "Failed: Stock not found!" << std::endl;
-            continue;
+            validStock = false;
+            return;
         }
         break;
     }
@@ -207,8 +208,9 @@ void action(Manager* manager, int input)
     {
         std::string file, stockName;
         int type;
-        data_stock_input(manager, file, stockName, type);
-        manager->add_market_data(file, stockName, type);
+        bool validStock = true;
+        data_stock_input(validStock, manager, file, stockName, type);
+        if(validStock) manager->add_market_data(file, stockName, type);
         break;
     }
     case SEARCH:

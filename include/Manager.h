@@ -1,6 +1,7 @@
 #ifndef MANAGER_H
 #define MANAGER_H
-#define STOCKS_SIZE 1301
+#define HASH_TABLE_SIZE 1301
+#define MAX_STOCKS 1000
 #include <string>
 #include "Stock.h"
 #include "HashTable.h"
@@ -59,7 +60,7 @@ class Manager
 public:
     Manager();
     ~Manager();
-    Stock* stocks[STOCKS_SIZE] = {nullptr};
+    Stock* stocks[HASH_TABLE_SIZE] = {nullptr};
     void add_stock(std::string name, std::string initials, std::string wkn);
     void print_stock(Stock* stock);
     std::string stock_toupper(std::string characters);
@@ -84,13 +85,14 @@ public:
 
 private:
     int stocksCount;
-    void import_data(std::vector<file_data>& data, Stock* stock, int importType);
+    void import_data(std::vector<file_data> data, Stock* stock, int importType);
     int count_file_lines(std::ifstream& file);
     void sort_data(std::vector<file_data>& data, int low, int high);
     void read_data(std::ifstream& input_file, std::vector<file_data>& data);
     bool is_date(std::string date);
     double get_max_closed(Stock* stock);
     bool valid_file(std::ifstream& file);
+    std::vector<double> get_y_close_data(int dataCount, Stock* stock);
 };
 
 #endif // MANAGER_H

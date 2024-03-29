@@ -22,6 +22,7 @@ public:
                          double close,
                          double volume,
                          double adjClose);
+    std::string get_last_market_data();
     std::string get_market_data();
     int get_market_data_capacity();
     int get_market_data_count();

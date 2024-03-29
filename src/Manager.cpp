@@ -6,7 +6,7 @@
 Manager::Manager()
 {
     stocksCount= 0;
-    hashtable = new HashTable(STOCKS_SIZE);
+    hashtable = new HashTable(HASH_TABLE_SIZE);
     name_initials = new std::unordered_map<std::string, std::string>;
     initials = new std::unordered_set<std::string>;
 }
@@ -21,11 +21,12 @@ Manager::~Manager()
 
 void Manager::add_stock(std::string name,std::string initials, std::string wkn)
 {
-    if(stocksCount + 1 >= STOCKS_SIZE)
+    if(stocksCount + 1 >= MAX_STOCKS)
     {
         std::cerr << "Failed: Maximum stock capacity reached!" << std::endl;
         return;
     }
+    if(search_stock(initials) != nullptr) return;
     name = stock_toupper(name), initials = stock_toupper(initials);
     int hashIndex = hashtable->hash_function(stocks, initials);
     stocks[hashIndex] = new Stock(name, initials, wkn);
@@ -54,7 +55,8 @@ void Manager::del_stock(std::string term)
     stocks[hashIndex] = nullptr;
     stocksCount--;
     auto index = std::find(storedIndexes.begin(), storedIndexes.end(), hashIndex);
-    if (index != storedIndexes.end()) {
+    if (index != storedIndexes.end())
+    {
         storedIndexes.erase(index);
     }
     std::cout << "Successfully deleted Stock!" << std::endl;
@@ -101,7 +103,7 @@ void Manager::print_stock(Stock* stock)
     std::cout << "WKN: " << stock->get_wkn() << std::endl;
     std::cout << "\n";
     if(stock->get_market_data_count() > 0)
-        std::cout << stock->get_market_data() << std::endl;
+        std::cout << stock->get_last_market_data() << std::endl;
 }
 
 bool Manager::name_exists(std::string name)
@@ -194,7 +196,7 @@ void Manager::read_data(std::ifstream& input_file, std::vector<file_data>& data)
     input_file.close();
 }
 
-void Manager::import_data(std::vector<file_data>& data, Stock* stock, int importType )
+void Manager::import_data(std::vector<file_data> data, Stock* stock, int importType )
 {
     if(importType == IMPORT_TYPE::REPLACING)
         stock->delete_market_data();
@@ -234,17 +236,8 @@ double Manager::get_max_closed(Stock* stock)
     return currentMax;
 }
 
-
-void Manager::plot_market_data(Stock* stock)
+std::vector<double> Manager::get_y_close_data(int dataCount, Stock* stock)
 {
-
-    double maxClose = get_max_closed(stock);
-    int dataCount = stock->get_market_data_count();
-    if(dataCount <= 0){
-        std::cout << "'" << stock->get_name() << "'" << " has no Market data yet!" << std::endl;
-        return;
-    }
-
     std::vector<double> closeData;
     for(int i = 0; i < dataCount; i++)
     {
@@ -252,9 +245,26 @@ void Manager::plot_market_data(Stock* stock)
     }
     std::sort(closeData.begin(), closeData.end());
     std::reverse(closeData.begin(), closeData.end());
+    double lastData = closeData.back() - ((closeData[0] - closeData.back()) / closeData.size());
+    closeData.push_back(lastData);
+    return closeData;
+}
+
+
+void Manager::plot_market_data(Stock* stock)
+{
+    int dataCount = stock->get_market_data_count();
+    if(dataCount <= 0)
+    {
+        std::cout << "'" << stock->get_name() << "'" << " has no Market data yet!" << std::endl;
+        return;
+    }
+
+    double maxClose = get_max_closed(stock);
+    std::vector<double> closeData= get_y_close_data(dataCount, stock);
+
 
     std::cout << "\nClose\n" << std::endl;
-
     for(int c = 0; c < closeData.size(); c++)
     {
         std::cout << std::fixed << std::setprecision(2) << closeData[c] << "  ";
@@ -263,10 +273,9 @@ void Manager::plot_market_data(Stock* stock)
             std::istringstream iss(stock->marketData[i]->get_date());
 
             double currStockClose = stock->marketData[i]->get_close();
-            if(currStockClose == closeData[c])std::cout << "_____ ";
+            if(currStockClose == closeData[c])std::cout << "______";
             else if(currStockClose > closeData[c]) std::cout << "|   | ";
-            else std::cout << "      ";
-
+            else std::cout << "______";
         }
         std::cout << "\n";
     }
@@ -284,7 +293,6 @@ void Manager::plot_market_data(Stock* stock)
     }
     std::cout << "     Days" << std::endl;
     std::cout << "\n";
-
 }
 
 void Manager::save_data()
@@ -312,17 +320,22 @@ void Manager::save_data()
 
 bool Manager::is_date(std::string date)
 {
-        if (date.length() != 10)
-            return false;
-        if (date[4] != '-' || date[7] != '-')
-            return false;
-        for (int i = 0; i < 10; ++i) {
-            if (i == 4 || i == 7)
-                continue;
+    if (date.length() != 10)
+        return false;
+    for (int i = 0; i < 10; ++i)
+    {
+        if (i == 4 || i == 7)
+        {
+            if (date[i] != '-' && date[i] != '/' && date[i] != '.')
+                return false;
+        }
+        else
+        {
             if (!std::isdigit(date[i]))
                 return false;
         }
-        return true;
+    }
+    return true;
 }
 
 void Manager::load_data(std::string filename)
@@ -331,8 +344,7 @@ void Manager::load_data(std::string filename)
     if(!valid_file(file)) return;
     std::vector<file_data> market_data;
     std::string line;
-    bool isStockHeader = true;
-    bool toAdd = false;
+    bool isStockHeader = true, toAdd = false, imported= false;
     Stock* stock = nullptr;
     while (std::getline(file, line))
     {
@@ -356,6 +368,7 @@ void Manager::load_data(std::string filename)
                 return;
             }
             isStockHeader = false;
+            imported = true;
             continue;
         }
         std::string date;
@@ -379,4 +392,5 @@ void Manager::load_data(std::string filename)
     // Für den letzten
     if (!market_data.empty())
         import_data(market_data, stock, static_cast<int>(IMPORT_TYPE::ADDING));
+    if(!imported) std::cout << "Warning: Could not import data!" << std::endl;
 }
