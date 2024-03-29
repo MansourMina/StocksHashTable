@@ -231,12 +231,16 @@ void action(Manager* manager, int input)
     }
     case SAVE:
     {
-        manager->serialize_data();
+        manager->save_data();
         break;
     }
     case LOAD:
     {
-        std::cout << "LOAD" << std::endl;
+        std::string filename;
+        std::cout << "File: ";
+        std::cin >> filename;
+        std::cout << "Test";
+        manager->load_data(filename);
         break;
     }
     case QUIT:

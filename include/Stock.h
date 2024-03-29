@@ -28,6 +28,7 @@ public:
     void delete_market_data();
     bool market_data_exists(std::string date);
     std::string serialize() const;
+
 private:
     std::string name;
     std::string wkn;

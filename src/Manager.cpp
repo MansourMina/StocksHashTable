@@ -32,6 +32,8 @@ void Manager::add_stock(std::string name,std::string initials, std::string wkn)
     (*name_initials)[name] = initials;
     this->initials->insert(initials);
     stocksCount++;
+    storedIndexes.push_back(hashIndex);
+    std::cout << "Successfully added Stock '" << stocks[hashIndex]->get_name() << "'" << std::endl;
 }
 
 void Manager::del_stock(std::string term)
@@ -51,7 +53,11 @@ void Manager::del_stock(std::string term)
     delete stocks[hashIndex];
     stocks[hashIndex] = nullptr;
     stocksCount--;
-    std::cout << "Success: Stock deleted!" << std::endl;
+    auto index = std::find(storedIndexes.begin(), storedIndexes.end(), hashIndex);
+    if (index != storedIndexes.end()) {
+        storedIndexes.erase(index);
+    }
+    std::cout << "Successfully deleted Stock!" << std::endl;
 
 
 }
@@ -78,20 +84,6 @@ Stock* Manager::search_stock(std::string term)
     return found_hashIndex == -1 ? nullptr:stocks[found_hashIndex];
 }
 
-
-//std::string Manager::get_initials(std::string name)
-//{
-//    if(name.length() <= 3) return name;
-//
-//    char initials[5];
-//    float position = 0;
-//    for(int i = 0; i < std::sqrt(name.length()); i++)
-//    {
-//        initials[i] = name[name.length() * position];
-//        position += 0.25;
-//    }
-//    return initials;
-//}
 
 std::string Manager::stock_toupper(std::string characters)
 {
@@ -134,17 +126,21 @@ bool Manager::stock_exists(std::string term)
     return !(hashIndex == -1);
 }
 
+bool Manager::valid_file(std::ifstream& file)
+{
+    if (!file)
+    {
+        std::cerr << "Error: Failed to open file!" << std::endl;
+        return false;
+    }
+    return true;
+}
+
 void Manager::add_market_data(std::string file, std::string term, int importType)
 {
     Stock* stock = search_stock(term);
-
     std::ifstream input_file(file);
-    if (!input_file)
-    {
-        std::cerr << "Error: Failed to open file!" << std::endl;
-        return;
-    }
-
+    if(!valid_file(input_file)) return;
     std::vector<file_data> data;
     read_data(input_file, data);
     sort_data(data, 0, data.size() - 1);
@@ -178,43 +174,24 @@ void Manager::sort_data(std::vector<file_data>& data, int low, int high)
     }
 }
 
-double Manager::convert_to_double(std::string number)
-{
-    return number.empty() ? 0.00: std::stod(number);
-}
+
 
 void Manager::read_data(std::ifstream& input_file, std::vector<file_data>& data)
 {
-    if (input_file)
+    std::string line;
+    int lineCounter= 0, beginWith = 1;
+    while (std::getline(input_file, line))
     {
-        std::string line;
-        int lineCounter= 0, beginWith = 1;
-        while (std::getline(input_file, line))
+        if(lineCounter >= beginWith)
         {
-            if(lineCounter >= beginWith)
-            {
-                std::stringstream ss(line);
-                file_data currData;
-                std::string column;
-                std::getline(ss, currData.date, ',');
-                std::getline(ss, column, ',');
-                currData.open =  convert_to_double(column);
-                std::getline(ss, column, ',');
-                currData.high = convert_to_double(column);
-                std::getline(ss, column, ',');
-                currData.low = convert_to_double(column);
-                std::getline(ss, column, ',');
-                currData.close = convert_to_double(column);
-                std::getline(ss, column, ',');
-                currData.adjClose = convert_to_double(column);
-                std::getline(ss, column);
-                currData.volume = convert_to_double(column);
-                data.push_back(currData);
-            }
-            lineCounter++;
+            std::stringstream ss(line);
+            file_data currData;
+            currData.parse_line(line);
+            data.push_back(currData);
         }
-        input_file.close();
+        lineCounter++;
     }
+    input_file.close();
 }
 
 void Manager::import_data(std::vector<file_data>& data, Stock* stock, int importType )
@@ -235,14 +212,12 @@ void Manager::import_data(std::vector<file_data>& data, Stock* stock, int import
             dublicates= true;
             continue;
         }
-        stock->add_market_data(currData.date, currData.open, currData.high, currData.low, currData.close, currData.volume, currData.adjClose);
+        stock->add_market_data(currData.date, currData.open, currData.high, currData.low, currData.close, currData.adjClose, currData.volume);
         added++;
     }
-    std::cout << "\n";
-    std::cout << "Market data added to Stock '" << stock->get_name() << "': " << added << std::endl;
+    std::cout << "Market data imported into Stock '" << stock->get_name() << "': " << added << std::endl;
     if(dataLost) std::cerr << "Warning: Market data lost. Exceeded maximum capacity of " << stock->get_market_data_capacity() << std::endl;
     if(dublicates) std::cerr << "Warning: Duplicate Market data detected." << std::endl;
-    std::cout << "\n";
 }
 
 double Manager::get_max_closed(Stock* stock)
@@ -259,25 +234,11 @@ double Manager::get_max_closed(Stock* stock)
     return currentMax;
 }
 
-double Manager::get_min_closed(Stock* stock)
-{
-    if(stock->get_market_data_count() <= 0) return 0.00;
-    double currentMin= stock->marketData[0]->get_close();
-    for(int i = 0; i < stock->get_market_data_count(); i++)
-    {
-        if(stock->marketData[i]->get_close() < currentMin)
-        {
-            currentMin = stock->marketData[i]->get_close();
-        }
-    }
-    return currentMin;
-}
 
 void Manager::plot_market_data(Stock* stock)
 {
 
     double maxClose = get_max_closed(stock);
-    double minClose = get_min_closed(stock);
     int dataCount = stock->get_market_data_count();
 
     std::vector<double> closeData;
@@ -288,23 +249,26 @@ void Manager::plot_market_data(Stock* stock)
     std::sort(closeData.begin(), closeData.end());
     std::reverse(closeData.begin(), closeData.end());
 
-    std::cout << "Close" << std::endl;
+    std::cout << "\nClose\n" << std::endl;
 
     for(int c = 0; c < closeData.size(); c++)
     {
-        std::cout << std::fixed << std::setprecision(2) << closeData[c] << " |";
+        std::cout << std::fixed << std::setprecision(2) << closeData[c] << "  ";
         for(int i = 0; i < dataCount; i++)
         {
             std::istringstream iss(stock->marketData[i]->get_date());
 
             double currStockClose = stock->marketData[i]->get_close();
-            std::cout << (currStockClose >= closeData[c] ? "*  " : "   ");
+            if(currStockClose == closeData[c])std::cout << "_____ ";
+            else if(currStockClose > closeData[c]) std::cout << "|   | ";
+            else std::cout << "      ";
+
         }
         std::cout << "\n";
     }
-
+    std::cout << "\n";
     for(int j = 0; j < std::to_string(maxClose).length() - 2; j++)
-        std::cout << "-";
+        std::cout << " ";
     for(int i = 0; i < dataCount; i++)
     {
 
@@ -312,13 +276,14 @@ void Manager::plot_market_data(Stock* stock)
         int year, month, day;
         char dash;
         iss >> year >> dash >> month >> dash >> day;
-        std::cout  << (month < 10 ? "0" + std::to_string(month) : std::to_string(month)) << "-";
+        std::cout  << (month < 10 ? "0" + std::to_string(month) : std::to_string(month)) << "-" << (day < 10 ? "0" + std::to_string(day) : std::to_string(day)) << " ";
     }
-    std::cout << "      Month" << std::endl;
+    std::cout << "     Days" << std::endl;
+    std::cout << "\n";
 
 }
 
-void Manager::serialize_data()
+void Manager::save_data()
 {
     const char* downloadsDir = std::getenv("USERPROFILE");
     if (downloadsDir == nullptr)
@@ -329,20 +294,76 @@ void Manager::serialize_data()
     std::string filename = std::string(downloadsDir) + "\\Downloads\\Stocks_data.csv";
     std::ofstream file(filename);
     bool isEmpty = true;
-    if (file.is_open())
+    for (int i = 0; i < storedIndexes.size(); ++i)
     {
-        for (int i = 0; i < STOCKS_SIZE; ++i)
-        {
-            if(stocks[i] == nullptr) continue;
-            file << stocks[i]->serialize() << "\n";
-            file << stocks[i]->get_market_data() << "\n";
-            isEmpty = false;
-        }
-        file.close();
+        int hashIndex = storedIndexes[i];
+        file << stocks[hashIndex]->serialize() << "\n";
+        file << stocks[hashIndex]->get_market_data() << "\n";
+        isEmpty = false;
     }
+    file.close();
     std::cout << (isEmpty ? "Error: No valid data found!":"Successfully saved stock data!") << std::endl;
 
 }
 
+bool Manager::is_date(std::string date)
+{
+    std::regex date_regex(R"(\d{4}-\d{2}-\d{2})");
+    return std::regex_match(date, date_regex);
+}
 
-
+void Manager::load_data(std::string filename)
+{
+    std::ifstream file(filename);
+    if(!valid_file(file)) return;
+    std::vector<file_data> market_data;
+    std::string line;
+    bool isStockHeader = true;
+    bool toAdd = false;
+    Stock* stock = nullptr;
+    while (std::getline(file, line))
+    {
+        std::stringstream ss(line);
+        if(!toAdd && line.empty())
+        {
+            isStockHeader = true;
+            continue;
+        }
+        if(isStockHeader)
+        {
+            std::string name, initials, wkn;
+            std::getline(ss, name, ',');
+            std::getline(ss, initials, ',');
+            ss >> wkn;
+            add_stock(name,initials,wkn);
+            stock = search_stock(initials);
+            if(stock == nullptr)
+            {
+                std::cout << "Warning: Could not import data!" << std::endl;
+                return;
+            }
+            isStockHeader = false;
+            continue;
+        }
+        std::string date;
+        std::getline(ss, date, ',');
+        if (is_date(date))
+        {
+            std::stringstream ss(line);
+            file_data currData;
+            currData.parse_line(line);
+            market_data.push_back(currData);
+            toAdd= true;
+        }
+        else if(toAdd)
+        {
+            import_data(market_data, stock, (int)IMPORT_TYPE::ADDING);
+            isStockHeader = true;
+            toAdd = false;
+            market_data.clear();
+        }
+    }
+    // Für den letzten
+    if (!market_data.empty())
+        import_data(market_data, stock, static_cast<int>(IMPORT_TYPE::ADDING));
+}

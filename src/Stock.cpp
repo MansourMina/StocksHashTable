@@ -10,6 +10,7 @@ Stock::Stock(std::string name, std::string initials, std::string wkn)
     marketDataCount = 0;
 }
 
+
 Stock::~Stock()
 {
     delete_market_data();
@@ -35,11 +36,12 @@ void Stock::add_market_data(std::string date,
                             double high,
                             double low,
                             double close,
-                            double volume,
-                            double adjClose)
+                            double adjClose,
+                            double volume
+                            )
 {
     if(marketDataCount + 1 > MAXIMUM_MARKET_DATA) return;
-    marketData[marketDataCount++] = new MarketData(date, open, high, low, close, volume, adjClose);
+    marketData[marketDataCount++] = new MarketData(date, open, high, low, close, adjClose, volume);
 }
 
 int Stock::get_market_data_capacity()

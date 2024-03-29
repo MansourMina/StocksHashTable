@@ -11,16 +11,18 @@ public:
                double high,
                double low,
                double close,
-               double volume,
-               double adjClose);
+               double adjClose,
+               double volume
+              );
     virtual ~MarketData();
     std::string get_date();
     double get_open();
     double get_high();
     double get_low();
     double get_close() const;
-    double get_volume();
     double get_adjClose();
+    double get_volume();
+
 
 private:
     std::string date;
@@ -28,8 +30,9 @@ private:
     double high;
     double low;
     double close;
-    double volume;
     double adjClose;
+    double volume;
+
 };
 
 #endif // MARKETDATA_H

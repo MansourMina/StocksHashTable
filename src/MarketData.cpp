@@ -1,12 +1,14 @@
 #include "MarketData.h"
+#include <iostream>
 
 MarketData::MarketData(std::string date,
                        double open,
                        double high,
                        double low,
                        double close,
-                       double volume,
-                       double adjClose)
+                       double adjClose,
+                       double volume
+                       )
 {
     this->date = date;
     this->open = open;

@@ -1,21 +1,21 @@
 # depslib dependency file v1.0
-1711663222 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\stock.cpp
+1711667954 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\stock.cpp
 	"Stock.h"
 	<string>
 	<iostream>
 
-1711663105 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\stock.h
+1711665970 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\stock.h
 	<string>
 	"MarketData.h"
 	<sstream>
 	<iomanip>
 
-1711663923 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\manager.cpp
+1711727121 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\manager.cpp
 	"Manager.h"
 	<iostream>
 	<cmath>
 
-1711663923 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\manager.h
+1711727138 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\manager.h
 	<string>
 	"Stock.h"
 	"HashTable.h"
@@ -25,8 +25,9 @@
 	<sstream>
 	<vector>
 	<algorithm>
+	<regex>
 
-1711663923 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\main.cpp
+1711727082 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\main.cpp
 	<iostream>
 	<string>
 	"Manager.h"
@@ -47,9 +48,10 @@
 	"HashTable.h"
 	<iostream>
 
-1711580931 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\marketdata.h
+1711667946 c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\include\marketdata.h
 	<string>
 
-1711580936 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\marketdata.cpp
+1711674876 source:c:\users\manso\onedrive\dokumente\fh technikum wien\semester 2\algorithmen und datenstrukturen labor\pb1\aktienkurse hashtabelle\src\marketdata.cpp
 	"MarketData.h"
+	<iostream>
 

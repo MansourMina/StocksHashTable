@@ -10,6 +10,7 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <regex>
 
 enum SEARCH_TYPE
 {
@@ -32,6 +33,25 @@ struct file_data
     double close;
     double adjClose;
     double volume;
+
+    void parse_line(std::string& line)
+    {
+        std::stringstream ss(line);
+        std::string column;
+        std::getline(ss, date, ',');
+        std::getline(ss, column, ',');
+        open = column.empty() ? 0.00: std::stod(column);
+        std::getline(ss, column, ',');
+        high = column.empty() ? 0.00: std::stod(column);
+        std::getline(ss, column, ',');
+        low = column.empty() ? 0.00: std::stod(column);
+        std::getline(ss, column, ',');
+        close = column.empty() ? 0.00: std::stod(column);
+        std::getline(ss, column, ',');
+        adjClose = column.empty() ? 0.00: std::stod(column);
+        std::getline(ss, column);
+        volume = column.empty() ? 0.00: std::stod(column);
+    }
 };
 
 class Manager
@@ -56,7 +76,10 @@ public:
     void add_market_data(std::string file, std::string term, int importType);
     bool stock_exists(std::string term);
     void plot_market_data(Stock* stock);
-    void serialize_data();
+    void save_data();
+    void load_data(std::string filename);
+
+    std::vector<int> storedIndexes;
 
 private:
     int stocksCount;
@@ -64,11 +87,9 @@ private:
     int count_file_lines(std::ifstream& file);
     void sort_data(std::vector<file_data>& data, int low, int high);
     void read_data(std::ifstream& input_file, std::vector<file_data>& data);
-    double convert_to_double(std::string number);
+    bool is_date(std::string date);
     double get_max_closed(Stock* stock);
-    double get_min_closed(Stock* stock);
-
-
+    bool valid_file(std::ifstream& file);
 };
 
 #endif // MANAGER_H
